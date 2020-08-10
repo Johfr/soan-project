@@ -6,20 +6,18 @@
         <StepFormHead v-bind:activeStep="indexActive"/>
 
         <!-- Import du formulaire -->
-
-        <form action="" method="POST">
-
+        <form action="" method="">
           <div class="etape etape1 active">
             <p>créer une entreprise</p>
             <h2>Quel est le statut de votre entreprise ?</h2>
-            <select name="" id="">
-              <option value="">EURL</option>
-              <option value="">SARL</option>
+            <select name="statuts" id="statut-select" @change="OnselectedOption($event)" v-model="selected">
+              <option value="eurl">EURL</option>
+              <option value="sarl">SARL</option>
             </select>
             
             <div class="btn-container">
               <p class="btn-previous">revenir plus tard</p>
-              <p class="btn-next" @click="checkStep">continuer</p>
+              <p class="btn-next" @click="nextStep">continuer</p>
             </div>
           </div>
           
@@ -92,7 +90,7 @@
             <!-- btn validation  -->
             <div class="btn-container">
               <p class="btn-previous" @click="previousStep">revenir plus tard</p>
-              <p class="btn-next" @click="checkStep">continuer</p>
+              <p class="btn-next" @click="nextStep">continuer</p>
             </div>
           </div>
 
@@ -194,15 +192,19 @@ export default {
     return {
       isValidated : false,
       steps: null,
-      indexActive: 0
+      indexActive: 0,
+      selected: null,
     }
   },
   mounted () {
     this.steps = document.querySelectorAll('.etape')
   },
   methods: {
-    checkStep (e) {
-      // let allSteps = document.querySelectorAll('.etape')
+    OnselectedOption (event) {
+      this.selected = event.target.value
+    },
+    
+    nextStep (e) {
       let parentBtn = e.target.closest('.etape')
       let parentBtnIsActive = e.target.closest('.etape').classList.contains('active')
       let parentNextEl = e.target.closest('.etape').nextElementSibling
@@ -220,9 +222,36 @@ export default {
           }
         })
       }
+
+      // Si les données sont saisies et validées
+      // si le champ est bien rempli
+      // on envoie la requête
+      if (this.steps[0]) {
+        if (this.selected != null) {
+          this.stepOneValidated(this.selected)
+          console.log(typeof this.selected)
+          console.log(this.selected)
+        }
+      }
     },
+
+    stepOneValidated (optionSelected) {
+      fetch('https://jsonplaceholder.typicode.com/posts', {
+          method: 'POST',
+          body: JSON.stringify({
+            statut: optionSelected,
+          }),
+          headers: {
+            "Content-type": "application/json; charset=UTF-8"
+          }
+        })
+        .then(response => response.json())
+        .then(json => {
+          console.log('response: ' + JSON.stringify(json));
+        })
+    },
+
     previousStep (e) {
-      // let allSteps = document.querySelectorAll('.etape')
       let parentBtn = e.target.closest('.etape')
       let parentBtnIsActive = e.target.closest('.etape').classList.contains('active')
       let parentNextEl = e.target.closest('.etape').previousElementSibling

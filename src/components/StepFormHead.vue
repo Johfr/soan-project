@@ -72,9 +72,6 @@ export default {
   },
   watch: {
     activeStep : function () {
-      console.log(this.steps)
-      
-
       this.steps.forEach((step, index) => {
         if(index != this.activeStep) {
           this.steps[index].classList.remove('active')
@@ -83,16 +80,12 @@ export default {
           this.steps[this.activeStep].classList.add('active')
           this.steps[this.activeStep].classList.remove('hidden')
         }
-        // step.classList.remove('active')
       })
 
     }
   },
   mounted () {
     this.steps = document.querySelectorAll('.step')
-    
-      console.log(this.steps)
-    // console.log(this.activeStep)
   },
 }
 </script>
